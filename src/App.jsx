@@ -1,41 +1,7 @@
 import { useState } from 'react'
+import { DestinationsPage } from './feature/destinations/Destinations'
+import { initialDestinations } from './feature/destinations/destinations.data'
 import './App.css'
-
-const initialDestinations = [
-  { id: 1, name: 'Algarve', location: 'Portugal', category: 'Slow travel', description: 'Cliffside mornings and saltwater afternoons.', image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=900&q=85' },
-  { id: 2, name: 'Kyoto', location: 'Japan', category: 'Culture', description: 'Find stillness in the details.', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=85' },
-  { id: 3, name: 'Patagonia', location: 'Chile', category: 'Adventure', description: 'Further than you have been before.', image: 'https://images.unsplash.com/photo-1478827387698-1527781a4887?auto=format&fit=crop&w=900&q=85' },
-  { id: 4, name: 'Amalfi Coast', location: 'Italy', category: 'Coastal', description: 'A bright escape above the Mediterranean.', image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=900&q=85' },
-]
-
-function DestinationForm({ destination, onSave, onClose }) {
-  const [form, setForm] = useState(destination || { name: '', location: '', category: 'City break', description: '', image: '' })
-
-  function updateField(event) {
-    setForm({ ...form, [event.target.name]: event.target.value })
-  }
-
-  function submitForm(event) {
-    event.preventDefault()
-    onSave({ ...form, image: form.image || 'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=85' })
-  }
-
-  return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="destination-modal" role="dialog" aria-modal="true" aria-labelledby="destination-form-title"><div className="modal-heading"><div><p className="eyebrow">DESTINATION MANAGER</p><h2 id="destination-form-title">{destination ? 'Edit destination' : 'Add a destination'}</h2></div><button className="close-button" type="button" onClick={onClose} aria-label="Close">×</button></div><form className="destination-form" onSubmit={submitForm}><div className="form-grid"><label>Name<input name="name" value={form.name} onChange={updateField} placeholder="e.g. Ubud" required /></label><label>Location<input name="location" value={form.location} onChange={updateField} placeholder="e.g. Indonesia" required /></label></div><label>Category<select name="category" value={form.category} onChange={updateField}><option>City break</option><option>Slow travel</option><option>Culture</option><option>Adventure</option><option>Coastal</option></select></label><label>Description<textarea name="description" value={form.description} onChange={updateField} placeholder="What makes this place special?" rows="3" required /></label><label>Image URL <span className="optional">optional</span><input name="image" value={form.image} onChange={updateField} placeholder="https://..." /></label><div className="modal-actions"><button className="secondary-button" type="button" onClick={onClose}>Cancel</button><button className="primary-button" type="submit">{destination ? 'Save changes' : 'Add destination'} <span>↗</span></button></div></form></section></div>
-}
-
-function DestinationsPage({ destinations, onAdd, onEdit, onDelete }) {
-  const [search, setSearch] = useState('')
-  const [editing, setEditing] = useState(null)
-  const filteredDestinations = destinations.filter((destination) => `${destination.name} ${destination.location}`.toLowerCase().includes(search.toLowerCase()))
-
-  function saveDestination(destination) {
-    if (editing?.id) onEdit(destination)
-    else onAdd({ ...destination, id: Date.now() })
-    setEditing(null)
-  }
-
-  return <div className="destination-page"><section className="destination-page-header"><div><p className="eyebrow">TRAVELGO LIBRARY</p><h1>Destinations</h1><p className="subheading">Curate the places that make your journey worth remembering.</p></div><button className="primary-button add-button" type="button" onClick={() => setEditing({})}>+ Add destination</button></section><section className="destination-toolbar"><div className="destination-search"><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name or location" /></div><span className="result-count">{filteredDestinations.length} {filteredDestinations.length === 1 ? 'destination' : 'destinations'}</span></section>{filteredDestinations.length ? <section className="managed-destination-grid">{filteredDestinations.map((destination) => <article className="managed-card" key={destination.id}><img src={destination.image} alt={destination.name} /><div className="managed-card-body"><div className="managed-card-top"><span className="card-tag light-tag">{destination.category}</span><button className="more-button" type="button" aria-label={`Actions for ${destination.name}`}>•••</button></div><div><h2>{destination.name}</h2><p className="managed-location">⌖ {destination.location}</p><p className="managed-description">{destination.description}</p></div><div className="card-actions"><button type="button" onClick={() => setEditing(destination)}>Edit</button><button className="delete-action" type="button" onClick={() => onDelete(destination.id)}>Delete</button></div></div></article>)}</section> : <div className="empty-state"><span>⌕</span><h2>No destinations found</h2><p>Try another name or location, or add a new destination.</p></div>}{editing && <DestinationForm destination={editing.id ? editing : null} onSave={saveDestination} onClose={() => setEditing(null)} />}</div>
-}
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
