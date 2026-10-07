@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DestinationsPage } from "./feature/destinations/Destinations";
 import { initialDestinations } from "./feature/destinations/destinations.data";
 import { TravelTipsPage } from "./feature/traveltips/TravelTips";
+import { ProfilePage } from "./feature/profile/Profile";
 import "./App.css";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("Explore");
   const [destinations, setDestinations] = useState(initialDestinations);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   function handleLogin(event) {
     event.preventDefault();
@@ -137,13 +139,48 @@ function App() {
             ),
           )}
         </nav>
-        <button className="profile-button" onClick={() => setIsLoggedIn(false)}>
-          <span>HA</span>
-          <strong>Harper Allen</strong>
-          <small>⌄</small>
-        </button>
+        <div className="profile-menu">
+          <button
+            className="profile-button"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={isProfileMenuOpen}
+            onClick={() => setIsProfileMenuOpen((isOpen) => !isOpen)}
+          >
+            <span>HA</span>
+            <strong>Harper Allen</strong>
+            <small>{isProfileMenuOpen ? "⌃" : "⌄"}</small>
+          </button>
+          {isProfileMenuOpen && (
+            <div className="profile-dropdown" role="menu" aria-label="Menu profil">
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setActiveTab("My Profile");
+                  setIsProfileMenuOpen(false);
+                }}
+              >
+                Lihat profil
+              </button>
+              <button
+                className="profile-dropdown-logout"
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  setIsLoggedIn(false);
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
-      {activeTab === "Destinations" ? (
+      {activeTab === "My Profile" ? (
+        <ProfilePage onLogout={() => setIsLoggedIn(false)} />
+      ) : activeTab === "Destinations" ? (
         <DestinationsPage
           destinations={destinations}
           onAdd={handleSaveDestination}
